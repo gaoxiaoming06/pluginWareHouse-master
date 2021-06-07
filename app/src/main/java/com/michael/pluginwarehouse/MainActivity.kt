@@ -2,6 +2,7 @@ package com.michael.pluginwarehouse
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Process
 import android.util.Log
 import android.view.View
 import android.view.animation.Animation
@@ -9,10 +10,23 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.transition.Transition
+import java.util.concurrent.TimeUnit
+import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     val TAG = "test"
+
+//    fun uncaughtException(thread: Thread, ex: Throwable) {
+//        RxTask.doInUIThreadDelay(object : () -> Unit{
+//            override fun invoke() {
+//                //杀死进程 todo onCreate中的错误 这里杀死之后会白屏 反复弹toast 重建死循环？
+//                Process.killProcess(Process.myPid())
+//                exitProcess(1)
+//            }
+//
+//        }, 3000, TimeUnit.MILLISECONDS) //3s的时间展示toast
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,12 +37,19 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             override fun onClick(v: View?) {
                 Exception().printStackTrace()
                 Log.i(TAG, "setCircleData: ")
+//                RxTask.doInUIThreadDelay(object : () -> Unit{
+//                    override fun invoke() {
+//                        //杀死进程
+//                        android.os.Process.killProcess(android.os.Process.myPid())
+//                        exitProcess(1)
+//                    }
+//
+//                }, 1500, TimeUnit.MILLISECONDS)
             }
 
         })
         findViewById<Button>(R.id.btnTestBackLamba).setOnClickListener {
-            Exception().printStackTrace()
-            Log.d(TAG, "-------btnTestBackLamba------")
+            throw UnsupportedOperationException("u can't instantiate me...");
         }
 
         val itemExamBinding = JvmTest()
@@ -81,7 +102,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         JvmTest().test(findViewById<Button>(R.id.btnTestBackLamba),object : JvmTest.ClickMonitor {
             override fun onClick(view: View) {
-                Log.d(TAG, "-------JvmTest------")
+                try {
+
+                    Log.d(TAG, "-------JvmTest------")
+                }catch (exception: Exception){
+                    throw exception
+                }
             }
         })
     }
@@ -92,8 +118,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btnTestBlock2222 -> {
+
                 Exception().printStackTrace()
-                Log.d(TAG, "-------btnTestBlock2222------")
+                try {
+                    var a = 9/0
+                }catch (e:Throwable){
+                    Log.d(TAG, "-------btnTestBlock2222------")
+                }
             }
         }
     }

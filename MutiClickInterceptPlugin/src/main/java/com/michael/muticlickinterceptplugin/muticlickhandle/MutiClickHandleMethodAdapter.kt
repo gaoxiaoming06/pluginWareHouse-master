@@ -27,9 +27,9 @@ class MutiClickHandleMethodAdapter(methodVisitor: MethodVisitor, descriptor: Str
         super.visitLocalVariable(name, descriptor, signature, start, end, index)
         println("visitLocalVariable: this--$this name--$name descriptor--$descriptor" +
                 " signature--$signature start--$start end--$end index--$index")
-        if(descriptor == "Landroid/view/View;"){
-            this.index = index
-        }
+//        if(descriptor == "Landroid/view/View;"){
+//            this.index = index
+//        }
     }
 
     override fun visitVarInsn(opcode: Int, `var`: Int) {
