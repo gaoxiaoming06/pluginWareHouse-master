@@ -1,6 +1,6 @@
 plugins {
     id 'java-library'
-    id 'maven'
+    id 'maven-publish'
 }
 
 java {
@@ -14,8 +14,8 @@ dependencies {
     implementation gradleApi()
     //groovy sdk
     implementation localGroovy()
-    implementation 'com.android.tools.build:gradle:4.2.1'
-    implementation 'com.android.tools.build:gradle-api:4.2.1'
+    implementation 'com.android.tools.build:gradle:4.2.2'
+    implementation 'com.android.tools.build:gradle-api:4.2.2'
 
     implementation 'org.ow2.asm:asm:6.2.1'
     //noinspection GradleDependency
@@ -34,15 +34,61 @@ repositories {
 group='com.base.transform'
 version='1.0.0'
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            //提交到远程服务器：
-//            repository(url: "http://127.0.0.1:8081/repository/michael-szm-test01/") {
-//                authentication(userName: "michaelszm", password: "szm12345")
-//            }
-            //本地的Maven地址设置为D:/repos
-            repository(url: uri('D:/snapshotRepo'))
-        }
+// 打包sourcesJar任务
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+// 打包javadocJar任务
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+// 解决javadoc打包乱码
+javadoc {
+    options {
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        author true
+        version true
+        title "文档大标题"
     }
 }
+
+publishing {
+    // 发布
+    publications {
+        mavenJava(MavenPublication) {
+            //指定group/artifact/version信息
+            groupId project.group
+            artifactId project.name
+            version project.version
+            // components.java jar包
+            // components.web war包
+            from components.java
+
+            // 增加 sourcesJar、javadocJar 任务
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+    // 发布仓库
+    repositories {
+        maven { url uri('D:/snapshotRepo') }
+    }
+}
+
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            //提交到远程服务器：
+////            repository(url: "http://127.0.0.1:8081/repository/michael-szm-test01/") {
+////                authentication(userName: "michaelszm", password: "szm12345")
+////            }
+//            //本地的Maven地址设置为D:/repos
+//            repository(url: uri('D:/snapshotRepo'))
+//        }
+//    }
+//}
